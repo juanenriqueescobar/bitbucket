@@ -1,0 +1,207 @@
+##
+# step 1: create repository vars
+
+- name: "step 0: clean environment"
+  juanenriqueescobar.bitbucket.repository_vars:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "merqueo/juan-enrique-test-repo"      
+    state:      "absent"
+    vars:       "{{TEST_VARS_DELETE}}"
+
+- name: "step 1: create repository's vars"
+  juanenriqueescobar.bitbucket.repository_vars:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "merqueo/juan-enrique-test-repo"      
+    state:      "present"
+    vars: "{{TEST_VARS_CREATE}}"
+  register: test_1
+  
+- debug:
+    var: test_1
+
+- name: "step 1: TEST result after create 1, not secured"
+  assert: 
+    that:
+      - test_1.meta.result[item.name].state == 'created'  
+      - test_1.meta.result[item.name].body.key == item.name
+      - test_1.meta.result[item.name].body.secured == item.secured 
+      - test_1.meta.result[item.name].body.type == 'pipeline_variable'
+      - test_1.meta.result[item.name].body.uuid is match(UUID_FORMAT)
+      - test_1.meta.result[item.name].body.value == item.value
+  loop: "{{TEST_VARS_CREATE}}" 
+  loop_control:
+    label: "{{item.name}}"
+  when: item.secured == False
+
+- name: "step 1: TEST result after create 1, is secured"
+  assert: 
+    that:
+      - test_1.meta.result[item.name].state == 'created'  
+      - test_1.meta.result[item.name].body.key == item.name
+      - test_1.meta.result[item.name].body.secured == item.secured 
+      - test_1.meta.result[item.name].body.type == 'pipeline_variable'
+      - test_1.meta.result[item.name].body.uuid is match(UUID_FORMAT)
+      - test_1.meta.result[item.name].body.value | default("") == ""
+  loop: "{{TEST_VARS_CREATE}}" 
+  loop_control:
+    label: "{{item.name}}"
+  when: item.secured == True
+
+- pause:
+    seconds: 5
+
+##
+# step 2: update repository vars
+- name: update repository's vars
+  juanenriqueescobar.bitbucket.repository_vars:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "merqueo/juan-enrique-test-repo"      
+    state:      "present"
+    vars:       
+      - name:    "VAR_1"
+        value:   "var 1 value-xxxxxxxxxxxxxx"
+        secured: true
+      - name:    "VAR_2"
+        value:   "-100"
+        secured: false
+      - name:    "VAR_3"
+        value:   "667.667"
+        secured: false
+      - name:    "VAR_4"
+        value:   "ssddff"
+        secured: false
+  register: test_2
+  
+- debug:
+    var: test_2
+
+# TODO: migrate to assert
+- name: TEST result after update 1
+  fail: 
+    msg: "the var {{item.name}} was not created"
+  when: >
+    test_2.meta.result[item.name].state != item.expected
+    or
+    (test_2.meta.result[item.name].state == 'update' 
+      and (
+        test_2.meta.result[item.name].body.key != item.name
+        or
+        test_2.meta.result[item.name].body.secured != item.secured 
+        or
+        test_2.meta.result[item.name].body.type != 'pipeline_variable'
+        or
+        test_2.meta.result[item.name].body.uuid is not match(UUID_FORMAT)
+        or
+        (test_2.meta.result[item.name].body.secured == False and test_2.meta.result[item.name].body.value != item.value)
+      )
+    )
+  loop: 
+    - name:     "VAR_1"
+      expected: "hidden"
+    - name:     "VAR_2"
+      expected: "updated"
+    - name:     "VAR_3"
+      expected: "not changed"
+    - name:     "VAR_4"
+      expected: "created"
+  loop_control:
+    label: "{{item.name}}"
+
+- pause:
+    seconds: 5
+
+# step 3: delete repository vars
+- name: "step 3: delete repository's vars"
+  juanenriqueescobar.bitbucket.repository_vars:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "merqueo/juan-enrique-test-repo"      
+    state:      "absent"
+    vars:       
+      - name: "VAR_1"
+      - name: "VAR_2"
+      - name: "VAR_3"        
+      - name: "VAR_4"
+  register: test_3
+
+- debug:
+    var: test_3
+  
+# TODO: migrate to assert
+- name: TEST result after delete 3
+  fail: 
+    msg: "the var {{item.name}} was not deleted"
+  when: test_3.meta.result[item.name].state != "deleted"
+  loop:
+    - name: "VAR_1"
+    - name: "VAR_2"
+    - name: "VAR_3"
+    - name: "VAR_4"
+  loop_control:
+    label: "{{item.name}}"
+
+# step 4: delete repository vars again
+- name: "step 4: delete repository's vars but not exists"
+  juanenriqueescobar.bitbucket.repository_vars:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "merqueo/juan-enrique-test-repo"      
+    state:      "absent"
+    vars:       
+      - name: "VAR_1"
+  register: test_4
+
+- debug:
+    var: test_4
+
+- name: "step 4: TEST"
+  assert: 
+    that:
+      - test_4.meta.result[item.name].state == "not exists"
+  loop:
+    - name: "VAR_1"
+  loop_control:
+    label: "{{item.name}}"
+
+- name: "step 5: failed module when delete"
+  juanenriqueescobar.bitbucket.repository_vars:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "xyzzz/zzzzxxxxyyyy"      
+    state:      "absent"
+    vars:       
+      - name: "VAR_1"
+  register: test_5
+  failed_when: False
+
+- debug:
+    var: test_5
+
+- name: "step 5: TEST"
+  assert:
+    that:
+      - test_5.meta.err_code == 404
+
+- name: "step 6: failed module when create"
+  juanenriqueescobar.bitbucket.repository_vars:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "xyzzz/zzzzxxxxyyyy"      
+    state:      "present"
+    vars:       
+      - name:  "VAR_1"
+        value: "1"
+        secured: false
+  register: test_6
+  failed_when: False
+
+- debug:
+    var: test_6
+
+- name: "step 6: TEST"
+  assert:
+    that:
+      - test_6.meta.err_code == 404

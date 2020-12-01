@@ -1,0 +1,19 @@
+
+UUID_FORMAT: '{[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}}'
+
+TEST_VARS_CREATE:
+  - name:    "VAR_1"
+    value:   "var 1 value"
+    secured: true
+  - name:    "VAR_2"
+    value:   "100"
+    secured: false
+  - name:    "VAR_3"
+    value:   "667.667"
+    secured: false
+    
+TEST_VARS_DELETE:
+  - name: "VAR_1"
+  - name: "VAR_2"
+  - name: "VAR_3"
+  - name: "VAR_4"
