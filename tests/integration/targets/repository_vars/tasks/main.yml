@@ -5,7 +5,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "merqueo/juan-enrique-test-repo"      
+    repository: "{{BITBUCKET_REPO}}"      
     state:      "absent"
     vars:       "{{TEST_VARS_DELETE}}"
 
@@ -13,7 +13,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "merqueo/juan-enrique-test-repo"      
+    repository: "{{BITBUCKET_REPO}}"      
     state:      "present"
     vars: "{{TEST_VARS_CREATE}}"
   register: test_1
@@ -58,7 +58,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "merqueo/juan-enrique-test-repo"      
+    repository: "{{BITBUCKET_REPO}}"      
     state:      "present"
     vars:       
       - name:    "VAR_1"
@@ -118,7 +118,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "merqueo/juan-enrique-test-repo"      
+    repository: "{{BITBUCKET_REPO}}"      
     state:      "absent"
     vars:       
       - name: "VAR_1"
@@ -148,7 +148,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "merqueo/juan-enrique-test-repo"      
+    repository: "{{BITBUCKET_REPO}}"      
     state:      "absent"
     vars:       
       - name: "VAR_1"
