@@ -1,0 +1,128 @@
+
+- name: "step 0: clean environment"
+  juanenriqueescobar.bitbucket.deployment:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPO}}"      
+    state:      "absent"
+    deployment: "{{item}}"
+  loop:
+    - Staging-1
+
+- name: "step 1: create deployment in staging"
+  juanenriqueescobar.bitbucket.deployment:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPO}}"      
+    state:      "present"
+    deployment: "Staging-1"
+    type:       "Staging"
+  register: step_1
+
+- name: "step 1: result"
+  debug:
+    var: step_1
+
+- name: "step 1: assert"
+  assert:
+    that:
+      - step_1.changed == true
+      - step_1.failed == false
+      - step_1.meta.repository == BITBUCKET_REPO
+      - step_1.meta.deployment == "Staging-1"
+      - step_1.meta.result.state == "created"
+      - step_1.meta.result.body.uuid is match(UUID_FORMAT)
+      - step_1.meta.result.body.name == "Staging-1"
+      - step_1.meta.result.body.slug == "staging-1"
+      - step_1.meta.result.body.type == "deployment_environment"
+      - step_1.meta.result.body.environment_type.name == "Staging"
+
+- pause:
+    seconds: 5
+
+- name: "step 2: create deployment in staging again"
+  juanenriqueescobar.bitbucket.deployment:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPO}}"      
+    state:      "present"
+    deployment: "Staging-1"
+    type:       "Staging"
+  register: step_2
+
+- name: "step 2: result"
+  debug:
+    var: step_2
+
+- name: "step 2: assert"
+  assert:
+    that:
+      - step_2.changed == false
+      - step_2.failed == false
+      - step_2.meta.repository == BITBUCKET_REPO
+      - step_2.meta.deployment == "Staging-1"
+      - step_2.meta.result.state == "not changed"
+
+- name: "step 3: delete deployment"
+  juanenriqueescobar.bitbucket.deployment:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPO}}"      
+    state:      "absent"
+    deployment: "Staging-1"
+  register: step_3
+
+- name: "step 3: result"
+  debug:
+    var: step_3
+
+- name: "step 3: assert"
+  assert:
+    that:
+      - step_3.changed == true
+      - step_3.failed == false
+      - step_3.meta.repository == BITBUCKET_REPO
+      - step_3.meta.deployment == "Staging-1"
+      - step_3.meta.result.state == "deleted"
+
+- name: "step 4: create deployment in invalid repo"
+  juanenriqueescobar.bitbucket.deployment:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "xxxxx/yyyyyy"      
+    state:      "present"
+    deployment: "Staging-1"
+    type:       "Staging"
+  register: step_4
+  failed_when: false
+
+- name: "step 4: result"
+  debug:
+    var: step_4
+
+- name: "step 4: assert"
+  assert:
+    that:
+      - step_4.changed == false
+      - step_4.meta.err_code == 404
+
+- name: "step 5: delete deployment in invalid repo"
+  juanenriqueescobar.bitbucket.deployment:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "xxxxx/yyyyyy"      
+    state:      "absent"
+    deployment: "Staging-1"
+    type:       "Staging"
+  register: step_5
+  failed_when: false
+
+- name: "step 5: result"
+  debug:
+    var: step_5
+
+- name: "step 5: assert"
+  assert:
+    that:
+      - step_5.changed == false
+      - step_5.meta.err_code == 404

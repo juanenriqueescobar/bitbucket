@@ -5,9 +5,10 @@ import time
 
 
 class BitbucketClientException(Exception):
-    def __init__(self, code, message):
+    def __init__(self, code, message, func):
         self.code = code
         self.message = message
+        self.func = func
 
 # TODO raise custom Exceptions
 # TODO raise exceptions if status code != 2XX
@@ -32,6 +33,8 @@ class BitbucketClient():
 
         return r
 
+# deployments
+
     def getDeploymentUUID(self, repository, deployment):
         # obtenemos el uuid del deployment
 
@@ -41,7 +44,7 @@ class BitbucketClient():
             if item['name'] == deployment:
                 return item['uuid']
 
-        raise Exception('deployment \'{}\' not found'.format(deployment))
+        raise BitbucketClientException(404, {}, 'getDeploymentUUID')
 
     def getDeployments(self, repository):
         # TODO pagination not used, maybe incomplete response
@@ -50,10 +53,11 @@ class BitbucketClient():
             self.url, repository)
 
         r = self.simple_get_retry(url, 200)
-        if r.status_code != 200:
-            raise Exception('impossible to get the deployments list \' uuid, code: {}'.format(
-                r.status_code))
-        return r.json()
+        if r.status_code == 200:
+            return r.json()
+
+        raise BitbucketClientException(
+            r.status_code, r.json(), 'getDeployments')
 
     def createDeployment(self, repository, deployment, environment_type):
         url = '{}/2.0/repositories/{}/environments/'.format(
@@ -68,17 +72,23 @@ class BitbucketClient():
 
         r = requests.post(url, auth=self.auth,
                           headers=self.headers, json=data)
-
-        return r.status_code
+        if r.status_code == 201:
+            return r.json()
+        raise BitbucketClientException(
+            r.status_code, r.json(), 'createDeployment')
 
     def removeDeployment(self, repository, deployment_uuid):
-        url = '{}/2.0/repositories/{}/environments/{}/'.format(
+        url = '{}/2.0/repositories/{}/environments/{}'.format(
             self.url, repository, deployment_uuid)
 
         r = requests.delete(url, auth=self.auth,
                             headers=self.headers)
 
-        return r.status_code
+        if r.status_code != 204:
+            raise BitbucketClientException(
+                r.status_code, r.json(), url)
+
+# deployment pattern
 
     def getDeploymentPatternUUID(self, repository, deployment_uuid, pattern):
         sc, data = self.getDeploymentPatterns(repository, deployment_uuid)
@@ -125,6 +135,8 @@ class BitbucketClient():
 
         return r.status_code
 
+# deployment vars
+
     def getDeploymentVars(self, repository, deployment, deployment_uuid):
         # obtenemos todas las variables del deployment
 
@@ -170,7 +182,8 @@ class BitbucketClient():
         r = requests.get(url, auth=self.auth, headers=self.headers)
         if r.status_code == 200:
             return r.json()['values']
-        raise BitbucketClientException(r.status_code, r.json())
+        raise BitbucketClientException(
+            r.status_code, r.json(), 'getRepositoryVars')
 
     def createRepositoryVar(self, repository, data):
         url = '{}/2.0/repositories/{}/pipelines_config/variables/'.format(
@@ -180,7 +193,8 @@ class BitbucketClient():
 
         if r.status_code == 201:
             return r.json()
-        raise BitbucketClientException(r.status_code, r.json())
+        raise BitbucketClientException(
+            r.status_code, r.json(), 'createRepositoryVar')
 
     def updateRepositoryVar(self, repository, var_uuid, data):
         url = '{}/2.0/repositories/{}/pipelines_config/variables/{}'.format(
@@ -191,7 +205,8 @@ class BitbucketClient():
 
         if r.status_code == 200:
             return r.json()
-        raise BitbucketClientException(r.status_code, r.json())
+        raise BitbucketClientException(
+            r.status_code, r.json(), 'updateRepositoryVar')
 
     def removeRepositoryVar(self, repository, var_uuid):
         url = '{}/2.0/repositories/{}/pipelines_config/variables/{}'.format(
@@ -200,4 +215,5 @@ class BitbucketClient():
                             headers=self.headers)
 
         if r.status_code != 204:
-            raise BitbucketClientException(r.status_code, r.json())
+            raise BitbucketClientException(
+                r.status_code, r.json(), 'removeRepositoryVar')
