@@ -161,7 +161,7 @@ def main():
         module.params['state'])(module.params)
 
     if has_failed:
-        module.fail_json(msg='Error setting repository var', meta=result)
+        module.fail_json(msg='Error', meta=result)
     else:
         module.exit_json(changed=has_changed, meta=result)
 

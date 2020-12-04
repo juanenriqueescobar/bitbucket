@@ -1,0 +1,150 @@
+
+- name: "step 0: clean environment"
+  juanenriqueescobar.bitbucket.deployment_pattern:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPO}}"      
+    state:      "absent"
+    deployment: "Staging"
+    pattern:    "master-123-*"
+
+- name: "step 1: create deployment pattern in staging"
+  juanenriqueescobar.bitbucket.deployment_pattern:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPO}}"      
+    state:      "present"
+    deployment: "Staging"
+    pattern:    "master-123-*"
+  register: step_1
+
+- name: "step 1: result"
+  debug:
+    var: step_1
+
+- name: "step 1: assert"
+  assert:
+    that:
+      - step_1.changed == true
+      - step_1.failed == false
+      - step_1.meta.repository == BITBUCKET_REPO
+      - step_1.meta.deployment == "Staging"
+      - step_1.meta.result.state == "created"
+      - step_1.meta.result.body.environmentUuid is match(UUID_FORMAT)
+      - step_1.meta.result.body.pattern == "master-123-*"
+      - step_1.meta.result.body.type == "branch_restriction_pattern"
+      - step_1.meta.result.body.uuid is match(UUID_FORMAT)
+
+- pause:
+    seconds: 5
+
+- name: "step 2: create deployment pattern in staging again"
+  juanenriqueescobar.bitbucket.deployment_pattern:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPO}}"      
+    state:      "present"
+    deployment: "Staging"
+    pattern:    "master-123-*"
+  register: step_2
+
+- name: "step 2: result"
+  debug:
+    var: step_2
+
+- name: "step 2: assert"
+  assert:
+    that:
+      - step_2.changed == false
+      - step_2.failed == false
+      - step_2.meta.repository == BITBUCKET_REPO
+      - step_2.meta.deployment == "Staging"
+      - step_2.meta.result.state == "not changed"
+
+- name: "step 3: delete deployment pattern"
+  juanenriqueescobar.bitbucket.deployment_pattern:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPO}}"      
+    state:      "absent"
+    deployment: "Staging"
+    pattern:    "master-123-*"
+  register: step_3
+
+- name: "step 3: result"
+  debug:
+    var: step_3
+
+- name: "step 3: assert"
+  assert:
+    that:
+      - step_3.changed == true
+      - step_3.failed == false
+      - step_3.meta.repository == BITBUCKET_REPO
+      - step_3.meta.deployment == "Staging"
+      - step_3.meta.result.state == "deleted"
+
+- name: "step 4: delete deployment pattern again"
+  juanenriqueescobar.bitbucket.deployment_pattern:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPO}}"      
+    state:      "absent"
+    deployment: "Staging"
+    pattern:    "master-123-*"
+  register: step_4
+
+- name: "step 4: result"
+  debug:
+    var: step_4
+
+- name: "step 4: assert"
+  assert:
+    that:
+      - step_4.changed == false
+      - step_4.failed == false
+      - step_4.meta.repository == BITBUCKET_REPO
+      - step_4.meta.deployment == "Staging"
+      - step_4.meta.result.state == "not exists"
+
+- name: "step 5: create deployment pattern in invalid repo"
+  juanenriqueescobar.bitbucket.deployment_pattern:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "xxxxx/yyyyyy"      
+    state:      "present"
+    deployment: "Staging"
+    pattern:    "xxx-yyy"
+  register: step_5
+  failed_when: false
+
+- name: "step 5: result"
+  debug:
+    var: step_5
+
+- name: "step 5: assert"
+  assert:
+    that:
+      - step_5.changed == false
+      - step_5.meta.err_code == 404
+
+- name: "step 6: delete deployment pattern in invalid repo"
+  juanenriqueescobar.bitbucket.deployment_pattern:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "xxxxx/yyyyyy"      
+    state:      "absent"
+    deployment: "Staging"
+    pattern:    "master-111111"
+  register: step_6
+  failed_when: false
+
+- name: "step 6: result"
+  debug:
+    var: step_6
+
+- name: "step 6: assert"
+  assert:
+    that:
+      - step_6.changed == false
+      - step_6.meta.err_code == 404

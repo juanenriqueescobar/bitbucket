@@ -14,22 +14,20 @@ deployment = None
 
 def present(data):
 
-    has_changed = False
-    result = None
-
     try:
-        deployments = client.getDeployments(
-            repository)
+        deployment_uuid = client.getDeploymentUUID(
+            repository, deployment)
 
-        deployment_uuid = ''
-        for item in deployments['values']:
-            if item['name'] == deployment:
-                deployment_uuid = item['uuid']
-                break
+        uuid = client.getDeploymentPatternUUID(
+            repository, deployment_uuid, data['pattern'])
 
-        if len(deployment_uuid) == 0:
-            body = client.createDeployment(
-                repository, deployment, data['type'])
+        has_changed = False
+        result = None
+
+        if len(uuid) == 0:
+            # el deployment no existe lo creamos
+            body = client.createDeploymentPattern(
+                repository, deployment_uuid, data['pattern'])
             has_changed = True
             result = {
                 'state': 'created',
@@ -43,29 +41,28 @@ def present(data):
     except BitbucketClientException as err:
         return True, False, {'err_code': err.code, 'err_message': err.message}
 
-    return False, has_changed, {'repository': repository, 'deployment': deployment, 'result': result}
+    return False, has_changed, {'repository': repository, 'deployment': deployment, 'pattern': data['pattern'], 'result': result}
 
 
 def absent(data):
 
-    has_changed = False
-    result = None
-
     try:
-        deployments = client.getDeployments(
-            repository)
+        deployment_uuid = client.getDeploymentUUID(
+            repository, deployment)
 
-        deployment_uuid = ''
-        for item in deployments['values']:
-            if item['name'] == deployment:
-                deployment_uuid = item['uuid']
-                break
+        uuid = client.getDeploymentPatternUUID(
+            repository, deployment_uuid, data['pattern'])
 
-        if len(deployment_uuid) != 0:
-            client.removeDeployment(repository, deployment_uuid)
+        has_changed = False
+        result = None
+
+        if len(uuid) != 0:
+            client.removeDeploymentPattern(
+                repository, deployment_uuid, uuid)
             has_changed = True
             result = {
                 'state': 'deleted',
+                'uuid': uuid,
             }
         else:
             result = {
@@ -73,9 +70,9 @@ def absent(data):
             }
 
     except BitbucketClientException as err:
-        return True, False, {'err_code': err.code, 'err_message': err.message, 'err_func': err.func}
+        return True, False, {'err_code': err.code, 'err_message': err.message}
 
-    return False, has_changed, {'repository': repository, 'deployment': deployment, 'result': result}
+    return False, has_changed, {'repository': repository, 'deployment': deployment, 'pattern': data['pattern'], 'result': result}
 
 
 def main():
@@ -98,9 +95,8 @@ def main():
             'required': True,
             'type': 'str',
         },
-        'type': {
-            'default': 'Test',
-            'choices': ['Test', 'Staging', 'Production'],
+        'pattern': {
+            'required': True,
             'type': 'str',
         },
         'state': {

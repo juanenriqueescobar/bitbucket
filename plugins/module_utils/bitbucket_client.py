@@ -44,7 +44,10 @@ class BitbucketClient():
             if item['name'] == deployment:
                 return item['uuid']
 
-        raise BitbucketClientException(404, {}, 'getDeploymentUUID')
+        data = {
+            'error': 'deployment \'{}\' not found'.format(deployment)
+        }
+        raise BitbucketClientException(404, data, 'getDeploymentUUID')
 
     def getDeployments(self, repository):
         # TODO pagination not used, maybe incomplete response
@@ -91,22 +94,26 @@ class BitbucketClient():
 # deployment pattern
 
     def getDeploymentPatternUUID(self, repository, deployment_uuid, pattern):
-        sc, data = self.getDeploymentPatterns(repository, deployment_uuid)
+        data = self.getDeploymentPatterns(repository, deployment_uuid)
         for item in data['values']:
             if item['pattern'] == pattern:
                 return item['uuid']
-        return ""
+
+        return ''
 
     def getDeploymentPatterns(self, repository, deployment_uuid):
-        # TODO is an internal api
+        # TODO this is an internal api
         # return all pattern from one deployment
         url = '{}/internal/repositories/{}/environments/{}/branch-restrictions/'.format(
             self.url, repository, deployment_uuid)
 
         r = requests.get(url, auth=self.auth,
                          headers=self.headers)
+        if r.status_code == 200:
+            return r.json()
 
-        return r.status_code, r.json()
+        raise BitbucketClientException(
+            r.status_code, r.json(), 'getDeploymentPatterns')
 
     def createDeploymentPattern(self, repository, deployment_uuid, pattern):
         # TODO is an internal api
@@ -121,8 +128,10 @@ class BitbucketClient():
 
         r = requests.post(url, auth=self.auth,
                           headers=self.headers, json=data)
-
-        return r.status_code, r.json()
+        if r.status_code == 201:
+            return r.json()
+        raise BitbucketClientException(
+            r.status_code, r.json(), 'createDeploymentPattern')
 
     def removeDeploymentPattern(self, repository, deployment_uuid, pattern_uuid):
         # TODO is an internal api
@@ -132,8 +141,9 @@ class BitbucketClient():
 
         r = requests.delete(url, auth=self.auth,
                             headers=self.headers)
-
-        return r.status_code
+        if r.status_code != 204:
+            raise BitbucketClientException(
+                r.status_code, r.json(), url)
 
 # deployment vars
 
