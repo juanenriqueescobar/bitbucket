@@ -1,0 +1,32 @@
+
+- name: run role
+  include_role:
+    name: juanenriqueescobar.bitbucket.ensure_pipeline
+  vars:
+    DEPLOYMENT_NAME:    "role-test-1"
+    DEPLOYMENT_TYPE:    "Test"
+    DEPLOYMENT_PATTERN: "master-123"    
+    DEPLOYMENT_VARS:
+      - name:    "AA"
+        value:   "aa"
+        secured: false
+      - name:    "BB"
+        value:   "bb"
+        secured: true
+    REPOSITORY_VARS:
+      - name:    "XX"
+        value:   "1"
+        secured: false
+      - name:    "YY"
+        value:   "2"
+        secured: true
+
+# TODO assert result, but how? 
+
+# - name: delete deployment
+#   juanenriqueescobar.bitbucket.deployment:
+#     username:   "{{BITBUCKET_USERNAME}}"
+#     password:   "{{BITBUCKET_PASSWORD}}"
+#     repository: "{{BITBUCKET_REPOSITORY}}"      
+#     state:      "absent"
+#     deployment: "role-test-1"

@@ -1,0 +1,40 @@
+
+- name: "create repository vars"
+  juanenriqueescobar.bitbucket.repository_vars:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"      
+    state:      "present"
+    vars:       "{{REPOSITORY_VARS}}"  
+
+- name: "create deployment"
+  juanenriqueescobar.bitbucket.deployment:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"      
+    deployment: "{{DEPLOYMENT_NAME}}"
+    state:      "present"
+    type:       "{{DEPLOYMENT_TYPE}}"
+
+- name: "create deployment pattern"
+  juanenriqueescobar.bitbucket.deployment_pattern:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"
+    deployment: "{{DEPLOYMENT_NAME}}"
+    state:      "present"
+    pattern:    "{{DEPLOYMENT_PATTERN}}"
+
+- name: "create deployment vars"
+  juanenriqueescobar.bitbucket.deployment_var:
+    username:    "{{BITBUCKET_USERNAME}}"
+    password:    "{{BITBUCKET_PASSWORD}}"
+    repository:  "{{BITBUCKET_REPOSITORY}}"      
+    deployment:  "{{DEPLOYMENT_NAME}}"
+    state:       "present"
+    var_name:    "{{item.name}}"
+    var_value:   "{{item.value}}"
+    var_secured: "{{item.secured}}"
+  loop:       "{{DEPLOYMENT_VARS}}" 
+  loop_control:
+    label: "{{item.name}}"
