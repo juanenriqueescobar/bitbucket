@@ -1,0 +1,76 @@
+
+- name: "step 0: clean environment"
+  juanenriqueescobar.bitbucket.repository_var:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"      
+    state:      "absent"
+    var_name:   "{{item.name}}"
+  loop:         "{{TEST_VARS_DELETE}}"
+
+- include_tasks: step_1.yml
+  loop: "{{TEST_VARS_CREATE}}"
+  loop_control:
+    label: "{{item.name}}"
+
+- pause:
+    seconds: 5
+
+- include_tasks: step_2.yml
+  loop: "{{TEST_VARS_UPDATE}}"
+  loop_control:
+    label: "{{item.name}}"
+
+- pause:
+    seconds: 5
+
+- include_tasks: step_3.yml
+  loop: "{{TEST_VARS_DELETE}}"
+  loop_control:
+    label: "{{item.name}}"
+
+- pause:
+    seconds: 5
+
+- include_tasks: step_4.yml
+  loop: "{{TEST_VARS_DELETE}}"
+  loop_control:
+    label: "{{item.name}}"
+
+- name: "step 5: failed module when delete"
+  juanenriqueescobar.bitbucket.repository_var:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "xyzzz/zzzzxxxxyyyy"      
+    state:      "absent"
+    var_name:   "VAR_1"
+  register: test_5
+  failed_when: False
+
+- debug:
+    var: test_5
+
+- name: "step 5: TEST"
+  assert:
+    that:
+      - test_5.meta.err_code == 404
+
+- name: "step 6: failed module when create"
+  juanenriqueescobar.bitbucket.repository_var:
+    username:    "{{BITBUCKET_USERNAME}}"
+    password:    "{{BITBUCKET_PASSWORD}}"
+    repository:  "xyzzz/zzzzxxxxyyyy"      
+    state:       "present"
+    var_name:    "VAR_1"
+    var_value:   "1"
+    var_secured: false
+  register: test_6
+  failed_when: False
+
+- debug:
+    var: test_6
+
+- name: "step 6: TEST"
+  assert:
+    that:
+      - test_6.meta.err_code == 404

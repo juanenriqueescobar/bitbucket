@@ -1,11 +1,17 @@
 
 - name: "create repository vars"
-  juanenriqueescobar.bitbucket.repository_vars:
-    username:   "{{BITBUCKET_USERNAME}}"
-    password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPOSITORY}}"      
-    state:      "present"
-    vars:       "{{REPOSITORY_VARS}}"  
+  juanenriqueescobar.bitbucket.repository_var:
+    username:    "{{BITBUCKET_USERNAME}}"
+    password:    "{{BITBUCKET_PASSWORD}}"
+    repository:  "{{BITBUCKET_REPOSITORY}}"      
+    state:       "present"
+    var_name:    "{{item.name}}"
+    var_value:   "{{item.value}}"
+    var_secured: "{{item.secured}}"
+  loop:          "{{REPOSITORY_VARS}}" 
+  loop_control:
+    label: "{{item.name}}"
+  
 
 - name: "create deployment"
   juanenriqueescobar.bitbucket.deployment:
@@ -35,6 +41,6 @@
     var_name:    "{{item.name}}"
     var_value:   "{{item.value}}"
     var_secured: "{{item.secured}}"
-  loop:       "{{DEPLOYMENT_VARS}}" 
+  loop:          "{{DEPLOYMENT_VARS}}" 
   loop_control:
     label: "{{item.name}}"
