@@ -1,5 +1,4 @@
 
-
 import requests
 import time
 
@@ -10,22 +9,20 @@ class BitbucketClientException(Exception):
         self.message = message
         self.func = func
 
-# TODO raise custom Exceptions
-# TODO raise exceptions if status code != 2XX
-
 
 class BitbucketClient():
 
     def __init__(self, username, password):
-        self.auth = (username, password)
         self.url = 'https://api.bitbucket.org'
-        self.headers = {
-            'Content-Type': 'application/json'
-        }
+        self.client = requests.Session()
+        self.client.auth = (username, password)
+        self.client.headers.update({
+            'Content-Type': 'application/json',
+        })
 
     def simple_get_retry(self, url, expected):
         for i in range(0, 5):
-            r = requests.get(url, auth=self.auth, headers=self.headers)
+            r = self.client.get(url)
             if r.status_code == expected:
                 break
             else:
@@ -73,8 +70,7 @@ class BitbucketClient():
             },
         }
 
-        r = requests.post(url, auth=self.auth,
-                          headers=self.headers, json=data)
+        r = self.client.post(url, json=data)
         if r.status_code == 201:
             return r.json()
         raise BitbucketClientException(
@@ -84,8 +80,7 @@ class BitbucketClient():
         url = '{}/2.0/repositories/{}/environments/{}'.format(
             self.url, repository, deployment_uuid)
 
-        r = requests.delete(url, auth=self.auth,
-                            headers=self.headers)
+        r = self.client.delete(url)
 
         if r.status_code != 204:
             raise BitbucketClientException(
@@ -107,8 +102,7 @@ class BitbucketClient():
         url = '{}/internal/repositories/{}/environments/{}/branch-restrictions/'.format(
             self.url, repository, deployment_uuid)
 
-        r = requests.get(url, auth=self.auth,
-                         headers=self.headers)
+        r = self.client.get(url)
         if r.status_code == 200:
             return r.json()
 
@@ -126,8 +120,7 @@ class BitbucketClient():
             'type': 'branch_restriction_pattern',
         }
 
-        r = requests.post(url, auth=self.auth,
-                          headers=self.headers, json=data)
+        r = self.client.post(url, json=data)
         if r.status_code == 201:
             return r.json()
         raise BitbucketClientException(
@@ -139,8 +132,7 @@ class BitbucketClient():
         url = '{}/internal/repositories/{}/environments/{}/branch-restrictions/{}'.format(
             self.url, repository, deployment_uuid, pattern_uuid)
 
-        r = requests.delete(url, auth=self.auth,
-                            headers=self.headers)
+        r = self.client.delete(url)
         if r.status_code != 204:
             raise BitbucketClientException(
                 r.status_code, r.json(), url)
@@ -163,8 +155,7 @@ class BitbucketClient():
     def createDeploymentVar(self, repository, deployment_uuid, data):
         url = '{}/2.0/repositories/{}/deployments_config/environments/{}/variables'.format(
             self.url, repository, deployment_uuid)
-        r = requests.post(url, auth=self.auth,
-                          headers=self.headers, json=data)
+        r = self.client.post(url, json=data)
         if r.status_code == 201:
             return r.json()
         raise BitbucketClientException(
@@ -173,8 +164,7 @@ class BitbucketClient():
     def updateDeploymentVar(self, repository, deployment_uuid, var_uuid, data):
         url = '{}/2.0/repositories/{}/deployments_config/environments/{}/variables/{}'.format(
             self.url, repository, deployment_uuid, var_uuid)
-        r = requests.put(url, auth=self.auth,
-                         headers=self.headers, json=data)
+        r = self.client.put(url, json=data)
 
         if r.status_code == 200:
             return r.json()
@@ -184,8 +174,7 @@ class BitbucketClient():
     def removeDeploymentVar(self, repository, deployment_uuid, var_uuid):
         url = '{}/2.0/repositories/{}/deployments_config/environments/{}/variables/{}'.format(
             self.url, repository, deployment_uuid, var_uuid)
-        r = requests.delete(url, auth=self.auth,
-                            headers=self.headers)
+        r = self.client.delete(url)
 
         if r.status_code != 204:
             raise BitbucketClientException(
@@ -196,7 +185,7 @@ class BitbucketClient():
     def getRepositoryVars(self, repository):
         url = '{}/2.0/repositories/{}/pipelines_config/variables/'.format(
             self.url, repository)
-        r = requests.get(url, auth=self.auth, headers=self.headers)
+        r = self.client.get(url)
         if r.status_code == 200:
             return r.json()['values']
         raise BitbucketClientException(
@@ -205,8 +194,7 @@ class BitbucketClient():
     def createRepositoryVar(self, repository, data):
         url = '{}/2.0/repositories/{}/pipelines_config/variables/'.format(
             self.url, repository)
-        r = requests.post(url, auth=self.auth,
-                          headers=self.headers, json=data)
+        r = self.client.post(url, json=data)
 
         if r.status_code == 201:
             return r.json()
@@ -217,8 +205,7 @@ class BitbucketClient():
         url = '{}/2.0/repositories/{}/pipelines_config/variables/{}'.format(
             self.url, repository, var_uuid)
 
-        r = requests.put(url, auth=self.auth,
-                         headers=self.headers, json=data)
+        r = self.client.put(url, json=data)
 
         if r.status_code == 200:
             return r.json()
@@ -228,8 +215,7 @@ class BitbucketClient():
     def removeRepositoryVar(self, repository, var_uuid):
         url = '{}/2.0/repositories/{}/pipelines_config/variables/{}'.format(
             self.url, repository, var_uuid)
-        r = requests.delete(url, auth=self.auth,
-                            headers=self.headers)
+        r = self.client.delete(url)
 
         if r.status_code != 204:
             raise BitbucketClientException(

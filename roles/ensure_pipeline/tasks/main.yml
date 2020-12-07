@@ -12,7 +12,6 @@
   loop_control:
     label: "{{item.name}}"
   
-
 - name: "create deployment"
   juanenriqueescobar.bitbucket.deployment:
     username:   "{{BITBUCKET_USERNAME}}"
