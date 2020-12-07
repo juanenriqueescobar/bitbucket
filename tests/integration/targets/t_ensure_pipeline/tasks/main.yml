@@ -3,16 +3,27 @@
   include_role:
     name: juanenriqueescobar.bitbucket.ensure_pipeline
   vars:
-    DEPLOYMENT_NAME:    "role-test-1"
-    DEPLOYMENT_TYPE:    "Test"
-    DEPLOYMENT_PATTERN: "master-123"    
-    DEPLOYMENT_VARS:
-      - name:    "AA"
-        value:   "aa"
-        secured: false
-      - name:    "BB"
-        value:   "bb"
-        secured: true
+    DEPLOYMENTS:
+      - DEPLOYMENT_NAME:    "role-test-1"
+        DEPLOYMENT_TYPE:    "Test"
+        DEPLOYMENT_PATTERN: "master-123-1"    
+        DEPLOYMENT_VARS:
+          - name:    "AA"
+            value:   "aa-1"
+            secured: false
+          - name:    "BB"
+            value:   "bb-1"
+            secured: true
+      - DEPLOYMENT_NAME:    "role-test-2"
+        DEPLOYMENT_TYPE:    "Test"
+        DEPLOYMENT_PATTERN: "master-123-2"    
+        DEPLOYMENT_VARS:
+          - name:    "AA"
+            value:   "aa-2"
+            secured: false
+          - name:    "BB"
+            value:   "bb-2"
+            secured: true
     REPOSITORY_VARS:
       - name:    "XX"
         value:   "1"
