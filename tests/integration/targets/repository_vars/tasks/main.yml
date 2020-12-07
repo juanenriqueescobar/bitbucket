@@ -3,7 +3,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "absent"
     vars:       "{{TEST_VARS_DELETE}}"
 
@@ -11,7 +11,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "present"
     vars: "{{TEST_VARS_CREATE}}"
   register: test_1
@@ -56,7 +56,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "present"
     vars:       
       - name:    "VAR_1"
@@ -116,7 +116,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "absent"
     vars:       
       - name: "VAR_1"
@@ -146,7 +146,7 @@
   juanenriqueescobar.bitbucket.repository_vars:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "absent"
     vars:       
       - name: "VAR_1"

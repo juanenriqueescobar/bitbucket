@@ -3,7 +3,7 @@
   juanenriqueescobar.bitbucket.deployment_pattern:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "absent"
     deployment: "Staging"
     pattern:    "master-123-*"
@@ -12,7 +12,7 @@
   juanenriqueescobar.bitbucket.deployment_pattern:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "present"
     deployment: "Staging"
     pattern:    "master-123-*"
@@ -27,7 +27,7 @@
     that:
       - step_1.changed == true
       - step_1.failed == false
-      - step_1.meta.repository == BITBUCKET_REPO
+      - step_1.meta.repository == BITBUCKET_REPOSITORY
       - step_1.meta.deployment == "Staging"
       - step_1.meta.result.state == "created"
       - step_1.meta.result.body.environmentUuid is match(UUID_FORMAT)
@@ -42,7 +42,7 @@
   juanenriqueescobar.bitbucket.deployment_pattern:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "present"
     deployment: "Staging"
     pattern:    "master-123-*"
@@ -57,7 +57,7 @@
     that:
       - step_2.changed == false
       - step_2.failed == false
-      - step_2.meta.repository == BITBUCKET_REPO
+      - step_2.meta.repository == BITBUCKET_REPOSITORY
       - step_2.meta.deployment == "Staging"
       - step_2.meta.result.state == "not changed"
 
@@ -65,7 +65,7 @@
   juanenriqueescobar.bitbucket.deployment_pattern:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "absent"
     deployment: "Staging"
     pattern:    "master-123-*"
@@ -80,7 +80,7 @@
     that:
       - step_3.changed == true
       - step_3.failed == false
-      - step_3.meta.repository == BITBUCKET_REPO
+      - step_3.meta.repository == BITBUCKET_REPOSITORY
       - step_3.meta.deployment == "Staging"
       - step_3.meta.result.state == "deleted"
 
@@ -88,7 +88,7 @@
   juanenriqueescobar.bitbucket.deployment_pattern:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPO}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"      
     state:      "absent"
     deployment: "Staging"
     pattern:    "master-123-*"
@@ -103,7 +103,7 @@
     that:
       - step_4.changed == false
       - step_4.failed == false
-      - step_4.meta.repository == BITBUCKET_REPO
+      - step_4.meta.repository == BITBUCKET_REPOSITORY
       - step_4.meta.deployment == "Staging"
       - step_4.meta.result.state == "not exists"
 
