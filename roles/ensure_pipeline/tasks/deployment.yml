@@ -1,5 +1,5 @@
 
-- name: "create deployment for: {{BITBUCKET_REPOSITORY}}"
+- name: "create deployment for: {{BITBUCKET_REPOSITORY}}/{{__loop_var_1.DEPLOYMENT_NAME}}"
   juanenriqueescobar.bitbucket.deployment:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
@@ -7,7 +7,7 @@
     deployment: "{{__loop_var_1.DEPLOYMENT_NAME}}"
     state:      "present"
 
-- name: "create deployment pattern for: {{BITBUCKET_REPOSITORY}}"
+- name: "create deployment pattern for: {{BITBUCKET_REPOSITORY}}/{{__loop_var_1.DEPLOYMENT_NAME}}"
   juanenriqueescobar.bitbucket.deployment_pattern:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
@@ -16,7 +16,7 @@
     state:      "present"
     pattern:    "{{__loop_var_1.DEPLOYMENT_PATTERN}}"
 
-- name: "create deployment vars for: {{BITBUCKET_REPOSITORY}}"
+- name: "create deployment vars for: {{BITBUCKET_REPOSITORY}}/{{__loop_var_1.DEPLOYMENT_NAME}}"
   juanenriqueescobar.bitbucket.deployment_var:
     username:    "{{BITBUCKET_USERNAME}}"
     password:    "{{BITBUCKET_PASSWORD}}"
