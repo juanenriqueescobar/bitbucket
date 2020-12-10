@@ -24,7 +24,7 @@
     repository: "{{BITBUCKET_REPOSITORY}}"
     deployment: "Staging"
     state:      "absent"
-    var_name:   "VAR_SEC_3_hash"
+    var_name:   "VAR_SEC_3__hash__"
   register: step_x
 
 - name: "step x: TEST result after delete"
