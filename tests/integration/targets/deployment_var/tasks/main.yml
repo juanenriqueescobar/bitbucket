@@ -7,7 +7,7 @@
     deployment: "Staging"
     state:      "absent"
     var_name:   "{{item.name}}"
-  loop: "{{TEST_VARS_DELETE}}"
+  loop: "{{TEST_VARS_DELETE + TEST_VARS_DELETE_2}}"
 
 - include_tasks: step_1.yml
   loop: "{{TEST_VARS_CREATE}}"
@@ -16,6 +16,20 @@
 
 - pause:
     seconds: 5
+
+- name: remove VAR_SEC_3_hash for testing
+  juanenriqueescobar.bitbucket.deployment_var:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"
+    deployment: "Staging"
+    state:      "absent"
+    var_name:   "VAR_SEC_3_hash"
+  register: step_x
+
+- name: "step x: TEST result after delete"
+  assert: 
+    that: step_x.meta.result.state == "deleted"
 
 - include_tasks: step_2.yml
   loop: "{{TEST_VARS_UPDATE}}"

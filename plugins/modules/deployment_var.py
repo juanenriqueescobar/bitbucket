@@ -7,83 +7,132 @@ from ansible_collections.juanenriqueescobar.bitbucket.plugins.module_utils.bitbu
 
 from ansible.module_utils.basic import AnsibleModule
 
+from hashlib import sha256
+from base64 import b64encode
+
 client = None
 repository = None
 deployment = None
 
 
-def phase_3(name, deployment_var):
+def phase_3(name, deployment_vars):
     # find especific var in list
 
-    for item in deployment_var:
+    for item in deployment_vars:
         if item['key'] == name:
             return item.get('uuid'), item.get('value'), item.get('secured')
     return '', '', False
 
 
+def nh(name):
+    return name+'__hash__'
+
+
+def createVar(deployment_uuid, name, value, secured):
+    d = {
+        'key': name,
+        'value': value,
+        'secured': secured,
+    }
+    body = client.createDeploymentVar(
+        repository, deployment_uuid, d)
+    return True, {
+        'state': 'created',
+        'body': body,
+    }
+
+
+def updateVar(deployment_uuid, uuid, name, value, secured):
+    d = {
+        'key': name,
+        'value': value,
+        'secured': secured,
+    }
+    body = client.updateDeploymentVar(repository, deployment_uuid, uuid, d)
+    body['environmentUuid'] = deployment_uuid
+    return True, {
+        'state': 'updated',
+        'body': body,
+    }
+
+
+def deleteVar(deployment_uuid, uuid):
+    client.removeDeploymentVar(
+        repository, deployment_uuid, uuid)
+    return True,  {
+        'state': 'deleted',
+    }
+
+
 def present(data):
+
+    has_changed = False
+    result = {}
+
     try:
         deployment_uuid = client.getDeploymentUUID(
             repository, deployment)
-        deployment_var = client.getDeploymentVars(
+        deployment_vars = client.getDeploymentVars(
             repository, deployment, deployment_uuid)
 
-        has_changed = False
-        result = {}
+        var_name = data['var_name']
+        var_value = data['var_value']
+        var_secured = data['var_secured']
 
-        uuid, value, secured = phase_3(data['var_name'], deployment_var)
+        hash_var_name = nh(var_name)
+        hash_var_value = b64encode(
+            sha256(var_value.encode('utf-8')).digest()).decode('utf-8')
+
+        uuid, value, secured = phase_3(var_name, deployment_vars)
 
         # la var no existe, hay que crearla
         if len(uuid) == 0:
-            d = {
-                'key': data['var_name'],
-                'value': data['var_value'],
-                'secured': data['var_secured'],
-            }
-            body = client.createDeploymentVar(
-                repository, deployment_uuid, d)
-            has_changed = True
-            result = {
-                'state': 'created',
-                'body': body,
-            }
+            has_changed, result = createVar(
+                deployment_uuid, var_name, var_value, var_secured)
+            if var_secured:
+                createVar(deployment_uuid,
+                          hash_var_name, hash_var_value, False)
 
-        # la var existe, pero es segura, no hacemos nada!!!
+        # la var existe pero es segura
         elif secured:
-            result = {
-                'state': 'hidden',
-                'body': {
-                    'environmentUuid': deployment_uuid,
-                    'key': data['var_name'],
-                    'secured': True,
-                    'uuid': uuid,
-                },
-            }
+            huuid, hvalue, hsecured = phase_3(
+                hash_var_name, deployment_vars)
+
+            if len(huuid) == 0:
+                has_changed, result = updateVar(
+                    deployment_uuid, uuid, var_name, var_value, var_secured)
+                createVar(deployment_uuid,
+                          hash_var_name, hash_var_value, False)
+            elif hvalue != hash_var_value:
+                has_changed, result = updateVar(
+                    deployment_uuid, uuid, var_name, var_value, var_secured)
+                updateVar(
+                    deployment_uuid, huuid, hash_var_name, hash_var_value, False)
+            else:
+                result = {
+                    'state': 'not changed',
+                    'body': {
+                        'environmentUuid': deployment_uuid,
+                        'key': var_name,
+                        'secured': True,
+                        'uuid': uuid,
+                    },
+                }
 
         # la var existe, hay que actualizarla
-        elif value != data['var_value']:
-            d = {
-                'key': data['var_name'],
-                'value': data['var_value'],
-                'secured': data['var_secured'],
-            }
-            body = client.updateDeploymentVar(
-                repository, deployment_uuid, uuid, d)
-            body['environmentUuid'] = deployment_uuid
-            has_changed = True
-            result = {
-                'state': 'updated',
-                'body': body,
-            }
+        elif value != var_value:
+            has_changed, result = updateVar(
+                deployment_uuid, uuid, var_name, var_value, var_secured)
+
         else:
             result = {
                 'state': 'not changed',
                 'body': {
                     'environmentUuid': deployment_uuid,
-                    'key': data['var_name'],
+                    'key': var_name,
                     'secured': False,
                     'uuid': uuid,
-                    'value': data['var_value'],
+                    'value': var_value,
                 },
             }
 
@@ -94,27 +143,28 @@ def present(data):
 
 
 def absent(data=None):
-   # borra las variables del deployment
+
+    has_changed = False
+    result = {}
 
     try:
         deployment_uuid = client.getDeploymentUUID(
             repository, deployment)
-        deployment_var = client.getDeploymentVars(
+        deployment_vars = client.getDeploymentVars(
             repository, deployment, deployment_uuid)
 
-        has_changed = False
-        result = {}
+        var_name = data['var_name']
+        hash_var_name = nh(var_name)
 
-        uuid, value, secured = phase_3(data['var_name'], deployment_var)
+        uuid, value, secured = phase_3(var_name, deployment_vars)
 
         # la var existe!, hay q borrarla
         if len(uuid) != 0:
-            client.removeDeploymentVar(
-                repository, deployment_uuid, uuid)
-            has_changed = True
-            result = {
-                'state': 'deleted',
-            }
+            has_changed, result = deleteVar(deployment_uuid, uuid)
+            if secured:
+                huuid, hvalue, hsecured = phase_3(
+                    hash_var_name, deployment_vars)
+                deleteVar(deployment_uuid, huuid)
         else:
             result = {
                 'state': 'not exists',

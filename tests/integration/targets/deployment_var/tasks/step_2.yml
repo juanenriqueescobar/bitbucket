@@ -13,7 +13,7 @@
 - debug:
     var: step_2
 
-- name: "step 2 TEST result after create 1, not secured"
+- name: "step 2 TEST result after update 1, not secured"
   assert: 
     that:
       - step_2.meta.result.state == TEST_VARS_UPDATE_EXPECT[item.name]
@@ -24,7 +24,7 @@
       - step_2.meta.result.body.value == item.value
   when: item.secured == False
 
-- name: "step 2: TEST result after create 1, is secured"
+- name: "step 2: TEST result after update 1, is secured"
   assert: 
     that:
       - step_2.meta.result.state == TEST_VARS_UPDATE_EXPECT[item.name]

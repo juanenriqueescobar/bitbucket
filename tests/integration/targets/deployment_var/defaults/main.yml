@@ -2,8 +2,14 @@
 UUID_FORMAT: '{[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}}'
 
 TEST_VARS_CREATE:
-  - name:    "VAR_1"
+  - name:    "VAR_SEC_1"
     value:   "var 1 value"
+    secured: true
+  - name:    "VAR_SEC_2"
+    value:   "var 1 value"
+    secured: true
+  - name:    "VAR_SEC_3"
+    value:   "var 3 value"
     secured: true
   - name:    "VAR_2"
     value:   "100"
@@ -13,14 +19,27 @@ TEST_VARS_CREATE:
     secured: false
     
 TEST_VARS_DELETE:
-  - name: "VAR_1"
+  - name: "VAR_SEC_1"
+  - name: "VAR_SEC_2"
+  - name: "VAR_SEC_3"
   - name: "VAR_2"
   - name: "VAR_3"
   - name: "VAR_4"
 
+TEST_VARS_DELETE_2:
+  - name: "VAR_SEC_1__hash__"
+  - name: "VAR_SEC_2__hash__"
+  - name: "VAR_SEC_3__hash__"
+
 TEST_VARS_UPDATE:
-  - name:    "VAR_1"
-    value:   "var 1 value-xxxxxxxxxxxxxx"
+  - name:    "VAR_SEC_1"
+    value:   "var 1 value"
+    secured: true
+  - name:    "VAR_SEC_2"
+    value:   "var 2 value"
+    secured: true
+  - name:    "VAR_SEC_3"
+    value:   "var 3 value"
     secured: true
   - name:    "VAR_2"
     value:   "-100"
@@ -33,7 +52,9 @@ TEST_VARS_UPDATE:
     secured: false
 
 TEST_VARS_UPDATE_EXPECT:
-  VAR_1: "hidden"
+  VAR_SEC_1: "not changed"
+  VAR_SEC_2: "updated"
+  VAR_SEC_3: "updated"
   VAR_2: "updated"
   VAR_3: "not changed"
   VAR_4: "created"
