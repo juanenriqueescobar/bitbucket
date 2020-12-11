@@ -15,6 +15,19 @@ TODO
 #### Username and Password
 
 This module was tested using "App passwords", to create one follow this steps [here](https://support.atlassian.com/bitbucket-cloud/docs/app-passwords/).
+
+#### Note about secured vars
+
+When the var was created as secured is impossible to compare the remote stored value with the local value, so the module can't determine if is needed to update or not, to fix this behavior the module create another non secured var with the sha256 of the secret.
+
+To determine if var is changed, the module compare the var hash and the remote stored hash.
+
+When the module is call with `state: absent` both vars will be delete.
+
+Example:
+
+![example secured var with hash](docs/img/secured_hash.png "secured var and his hash")
+
 ### Modules
 
 #### Repository Var
