@@ -81,6 +81,47 @@ Modify deployment's vars
         var_value:   String
         var_secured: Bool
 
+#### Examples
+
+    - name: create secured variable at repository level  
+      juanenriqueescobar.bitbucket.repository_var:
+        username:    myuser
+        password:    password-generated-by-bitbucket
+        repository:  myworkspace/myrepo
+        state:       present
+        var_name:    Application
+        var_value:   us-east-app-1
+        var_secured: false
+
+    - name: create deployment
+      juanenriqueescobar.bitbucket.deployment:
+        username:    myuser
+        password:    password-generated-by-bitbucket
+        repository:  myworkspace/myrepo
+        state:       present
+        deployment:  region-us-east-1
+        type:        Production
+
+    - name: set the branch pattern for deployment
+      juanenriqueescobar.bitbucket.deployment_pattern:
+        username:    myuser
+        password:    password-generated-by-bitbucket
+        repository:  myworkspace/myrepo
+        state:       present
+        deployment:  region-us-east-1
+        pattern:     deploy/us-east-1
+
+    - name: create variable at deployment level var
+      juanenriqueescobar.bitbucket.deployment_var:
+        username:    myuser
+        password:    password-generated-by-bitbucket
+        repository:  myworkspace/myrepo
+        state:       present
+        deployment:  region-us-east-1
+        var_name:    AWS_SECRET_ACCESS_KEY
+        var_value:   "{{secrets.us_east_1.ACCESS_KEY}}"
+        var_secured: true
+
 ### Roles
 
 #### Ensure pipeline
