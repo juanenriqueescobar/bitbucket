@@ -1,10 +1,75 @@
 #!/usr/bin/python
 
+# Copyright: (c) 2020, Juan Enrique Escobar <https://github.com/juanenriqueescobar>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible_collections.juanenriqueescobar.bitbucket.plugins.module_utils.bitbucket_client import BitbucketClient, BitbucketClientException
+DOCUMENTATION = r'''
+---
+module: deployment
 
+short_description: create a deployment in repository
+
+version_added: "0.0.0"
+
+description: create a deployment in repository
+
+options:
+    username:
+        description: The bitbucket username
+        required: true
+        type: str
+    password:
+        description: The bitbucket password
+        required: true
+        type: str
+    repository:
+        description: The workspace/repo
+        required: true
+        type: str
+    deployment:
+        description: The name of deployment
+        required: true
+        type: str
+    state:
+        description: create or remove the deployment
+        type: str
+        default: present
+        choices: ['present', 'absent']
+    type:
+        description: The type of deployment
+        type: str
+        default: Test
+        choices: ['Test', 'Staging', 'Production']
+
+author:
+    - Juan Enrique Escobar Robles (@juanenriqueescobar)
+'''
+
+EXAMPLES = r'''
+
+- name: create deployment
+  juanenriqueescobar.bitbucket.deployment:
+    username:    myuser
+    password:    password-generated-by-bitbucket
+    repository:  myworkspace/myrepo
+    state:       present
+    deployment:  region-us-east-1
+    type:        Production
+'''
+
+RETURN = r'''
+
+message:
+    description: The output message that the test module generates.
+    type: str
+    returned: always
+    sample: 'goodbye'
+'''
+
+from ansible_collections.juanenriqueescobar.bitbucket.plugins.module_utils.bitbucket_client import BitbucketClient, BitbucketClientException
 from ansible.module_utils.basic import AnsibleModule
 
 client = None
@@ -98,21 +163,21 @@ def main():
             'required': True,
             'type': 'str',
         },
-        'type': {
-            'default': 'Test',
-            'choices': ['Test', 'Staging', 'Production'],
-            'type': 'str',
-        },
         'state': {
             'default': 'present',
             'choices': ['present', 'absent'],
             'type': 'str'
         },
+        'type': {
+            'default': 'Test',
+            'choices': ['Test', 'Staging', 'Production'],
+            'type': 'str',
+        },
     }
 
     choice_map = {
         'present': present,
-        'absent':  absent,
+        'absent': absent,
     }
 
     module = AnsibleModule(argument_spec=fields)

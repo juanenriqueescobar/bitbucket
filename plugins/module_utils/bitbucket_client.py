@@ -1,6 +1,8 @@
-
+from __future__ import (absolute_import, division, print_function)
 import requests
 import time
+
+__metaclass__ = type
 
 
 class BitbucketClientException(Exception):
@@ -25,8 +27,7 @@ class BitbucketClient():
             r = self.client.get(url)
             if r.status_code == expected:
                 break
-            else:
-                time.sleep(i)
+            time.sleep(i)
 
         return r
 
@@ -42,14 +43,14 @@ class BitbucketClient():
                 return item['uuid']
 
         data = {
-            'error': 'deployment \'{}\' not found'.format(deployment)
+            'error': 'deployment \'{0}\' not found'.format(deployment)
         }
         raise BitbucketClientException(404, data, 'getDeploymentUUID')
 
     def getDeployments(self, repository):
         # TODO pagination not used, maybe incomplete response
 
-        url = '{}/2.0/repositories/{}/environments/'.format(
+        url = '{0}/2.0/repositories/{1}/environments/'.format(
             self.url, repository)
 
         r = self.simple_get_retry(url, 200)
@@ -60,7 +61,7 @@ class BitbucketClient():
             r.status_code, r.json(), 'getDeployments')
 
     def createDeployment(self, repository, deployment, environment_type):
-        url = '{}/2.0/repositories/{}/environments/'.format(
+        url = '{0}/2.0/repositories/{1}/environments/'.format(
             self.url, repository)
 
         data = {
@@ -77,7 +78,7 @@ class BitbucketClient():
             r.status_code, r.json(), 'createDeployment')
 
     def removeDeployment(self, repository, deployment_uuid):
-        url = '{}/2.0/repositories/{}/environments/{}'.format(
+        url = '{0}/2.0/repositories/{1}/environments/{2}'.format(
             self.url, repository, deployment_uuid)
 
         r = self.client.delete(url)
@@ -99,7 +100,7 @@ class BitbucketClient():
     def getDeploymentPatterns(self, repository, deployment_uuid):
         # TODO this is an internal api
         # return all pattern from one deployment
-        url = '{}/internal/repositories/{}/environments/{}/branch-restrictions/'.format(
+        url = '{0}/internal/repositories/{1}/environments/{2}/branch-restrictions/'.format(
             self.url, repository, deployment_uuid)
 
         r = self.client.get(url)
@@ -112,7 +113,7 @@ class BitbucketClient():
     def createDeploymentPattern(self, repository, deployment_uuid, pattern):
         # TODO is an internal api
 
-        url = '{}/internal/repositories/{}/environments/{}/branch-restrictions/'.format(
+        url = '{0}/internal/repositories/{1}/environments/{2}/branch-restrictions/'.format(
             self.url, repository, deployment_uuid)
 
         data = {
@@ -129,7 +130,7 @@ class BitbucketClient():
     def removeDeploymentPattern(self, repository, deployment_uuid, pattern_uuid):
         # TODO is an internal api
 
-        url = '{}/internal/repositories/{}/environments/{}/branch-restrictions/{}'.format(
+        url = '{0}/internal/repositories/{1}/environments/{2}/branch-restrictions/{3}'.format(
             self.url, repository, deployment_uuid, pattern_uuid)
 
         r = self.client.delete(url)
@@ -142,7 +143,7 @@ class BitbucketClient():
     def getDeploymentVars(self, repository, deployment, deployment_uuid):
         # obtenemos todas las variables del deployment
 
-        url = '{}/2.0/repositories/{}/deployments_config/environments/{}/variables?pagelen=20'.format(
+        url = '{0}/2.0/repositories/{1}/deployments_config/environments/{2}/variables?pagelen=20'.format(
             self.url, repository, deployment_uuid)
 
         r = self.simple_get_retry(url, 200)
@@ -153,7 +154,7 @@ class BitbucketClient():
             r.status_code, r.json(), 'getDeploymentVars')
 
     def createDeploymentVar(self, repository, deployment_uuid, data):
-        url = '{}/2.0/repositories/{}/deployments_config/environments/{}/variables'.format(
+        url = '{0}/2.0/repositories/{1}/deployments_config/environments/{2}/variables'.format(
             self.url, repository, deployment_uuid)
         r = self.client.post(url, json=data)
         if r.status_code == 201:
@@ -162,7 +163,7 @@ class BitbucketClient():
             r.status_code, r.json(), 'createDeploymentVar')
 
     def updateDeploymentVar(self, repository, deployment_uuid, var_uuid, data):
-        url = '{}/2.0/repositories/{}/deployments_config/environments/{}/variables/{}'.format(
+        url = '{0}/2.0/repositories/{1}/deployments_config/environments/{2}/variables/{3}'.format(
             self.url, repository, deployment_uuid, var_uuid)
         r = self.client.put(url, json=data)
 
@@ -172,7 +173,7 @@ class BitbucketClient():
             r.status_code, r.json(), 'updateDeploymentVar')
 
     def removeDeploymentVar(self, repository, deployment_uuid, var_uuid):
-        url = '{}/2.0/repositories/{}/deployments_config/environments/{}/variables/{}'.format(
+        url = '{0}/2.0/repositories/{1}/deployments_config/environments/{2}/variables/{3}'.format(
             self.url, repository, deployment_uuid, var_uuid)
         r = self.client.delete(url)
 
@@ -183,7 +184,7 @@ class BitbucketClient():
 # repository
 
     def getRepositoryVars(self, repository):
-        url = '{}/2.0/repositories/{}/pipelines_config/variables/'.format(
+        url = '{0}/2.0/repositories/{1}/pipelines_config/variables/'.format(
             self.url, repository)
         r = self.client.get(url)
         if r.status_code == 200:
@@ -192,7 +193,7 @@ class BitbucketClient():
             r.status_code, r.json(), 'getRepositoryVars')
 
     def createRepositoryVar(self, repository, data):
-        url = '{}/2.0/repositories/{}/pipelines_config/variables/'.format(
+        url = '{0}/2.0/repositories/{1}/pipelines_config/variables/'.format(
             self.url, repository)
         r = self.client.post(url, json=data)
 
@@ -202,7 +203,7 @@ class BitbucketClient():
             r.status_code, r.json(), 'createRepositoryVar')
 
     def updateRepositoryVar(self, repository, var_uuid, data):
-        url = '{}/2.0/repositories/{}/pipelines_config/variables/{}'.format(
+        url = '{0}/2.0/repositories/{1}/pipelines_config/variables/{2}'.format(
             self.url, repository, var_uuid)
 
         r = self.client.put(url, json=data)
@@ -213,7 +214,7 @@ class BitbucketClient():
             r.status_code, r.json(), 'updateRepositoryVar')
 
     def removeRepositoryVar(self, repository, var_uuid):
-        url = '{}/2.0/repositories/{}/pipelines_config/variables/{}'.format(
+        url = '{0}/2.0/repositories/{1}/pipelines_config/variables/{2}'.format(
             self.url, repository, var_uuid)
         r = self.client.delete(url)
 

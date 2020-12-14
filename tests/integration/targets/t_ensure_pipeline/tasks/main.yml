@@ -1,4 +1,3 @@
-
 - name: run role
   include_role:
     name: juanenriqueescobar.bitbucket.ensure_pipeline

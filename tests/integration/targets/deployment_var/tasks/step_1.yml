@@ -1,4 +1,3 @@
-
 - name: "step 1: create deployments's vars"
   juanenriqueescobar.bitbucket.deployment_var:
     username:    "{{BITBUCKET_USERNAME}}"

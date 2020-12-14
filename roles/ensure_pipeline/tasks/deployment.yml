@@ -1,4 +1,3 @@
-
 - name: "create deployment for: {{BITBUCKET_REPOSITORY}}/{{__loop_var_1.DEPLOYMENT_NAME}}"
   juanenriqueescobar.bitbucket.deployment:
     username:   "{{BITBUCKET_USERNAME}}"

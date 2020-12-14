@@ -1,4 +1,3 @@
-
 - name: "step 0: clean environment"
   juanenriqueescobar.bitbucket.repository_var:
     username:   "{{BITBUCKET_USERNAME}}"

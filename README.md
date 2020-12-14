@@ -2,7 +2,7 @@
 
 ## Target
 
-This collection was created to manipulate Bitbucket's repositories and pipelines.
+This collection was created to manipulate Bitbucket's repositories and deployments.
 
 > __Warning__: This collection uses a mix of internal and external APIs of Bitbucket, changes in internal APIs can broke the collection.
 

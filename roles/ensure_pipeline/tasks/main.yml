@@ -1,4 +1,3 @@
-
 - name: "create repository vars for: {{BITBUCKET_REPOSITORY}}"
   juanenriqueescobar.bitbucket.repository_var:
     username:    "{{BITBUCKET_USERNAME}}"
