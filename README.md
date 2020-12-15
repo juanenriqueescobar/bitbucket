@@ -30,6 +30,8 @@ Example:
 
 ### Modules
 
+> Every module has his own documentation with more details.
+
 #### Repository Var
 
 Modify repository's vars
@@ -111,7 +113,7 @@ Modify deployment's vars
         deployment:  region-us-east-1
         pattern:     deploy/us-east-1
 
-    - name: create variable at deployment level var
+    - name: create variable at deployment level
       juanenriqueescobar.bitbucket.deployment_var:
         username:    myuser
         password:    password-generated-by-bitbucket

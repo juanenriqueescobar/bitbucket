@@ -57,32 +57,48 @@ author:
 
 
 EXAMPLES = r'''
-# Pass in a message
-- name: Test with a message
-  my_namespace.my_collection.my_test_info:
-    name: hello world
+- name: create variable at deployment level
+  juanenriqueescobar.bitbucket.deployment_var:
+    username:    myuser
+    password:    password-generated-by-bitbucket
+    repository:  myworkspace/myrepo
+    state:       present
+    deployment:  region-us-east-1
+    var_name:    AWS_SECRET_ACCESS_KEY
+    var_value:   MysUpErSeCrEt
+    var_secured: true
+
+- name: delete variable at deployment level
+  juanenriqueescobar.bitbucket.deployment_var:
+    username:    myuser
+    password:    password-generated-by-bitbucket
+    repository:  myworkspace/myrepo
+    state:       absent
+    deployment:  region-us-east-1
+    var_name:    AWS_SECRET_ACCESS_KEY
 '''
 
 RETURN = r'''
-# These are examples of possible return values, and in general should use other names for return values.
-original_message:
-    description: The original name param that was passed in.
+repository:
+    description: The original repository param that was passed in.
     type: str
     returned: always
-    sample: 'hello world'
-message:
-    description: The output message that the test module generates.
+deployment:
+    description: The original deployment param that was passed in.
     type: str
     returned: always
-    sample: 'goodbye'
-my_useful_info:
-    description: The dictionary containing information about your system.
+result:
+    description: the result of the api call
     type: dict
     returned: always
-    sample: {
-        'foo': 'bar',
-        'answer': 42,
-    }
+result.body:
+    description: body of the api call
+    type: dict
+    returned: only when result.state is created or updated
+result.state:
+    description: one of 'created, updated, not changed, deleted, not exists'
+    type: str
+    returned: always
 '''
 
 from ansible.module_utils.basic import AnsibleModule
