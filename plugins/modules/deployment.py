@@ -58,15 +58,37 @@ EXAMPLES = r'''
     state:       present
     deployment:  region-us-east-1
     type:        Production
+
+- name: delete deployment
+  juanenriqueescobar.bitbucket.deployment:
+    username:    myuser
+    password:    password-generated-by-bitbucket
+    repository:  myworkspace/myrepo
+    state:       absent
+    deployment:  region-us-east-1
 '''
 
 RETURN = r'''
-
-message:
-    description: The output message that the test module generates.
+repository:
+    description: The original repository param that was passed in.
     type: str
     returned: always
-    sample: 'goodbye'
+deployment:
+    description: The original deployment param that was passed in.
+    type: str
+    returned: always
+result:
+    description: the result of the api call
+    type: dict
+    returned: always
+result.body:
+    description: body of the api call
+    type: dict
+    returned: only when result.state is created or updated
+result.state:
+    description: one of 'created, updated, not changed, deleted, not exists'
+    type: str
+    returned: always
 '''
 
 from ansible_collections.juanenriqueescobar.bitbucket.plugins.module_utils.bitbucket_client import BitbucketClient, BitbucketClientException
