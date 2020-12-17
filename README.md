@@ -10,7 +10,7 @@ This collection was created to manipulate Bitbucket's repositories and deploymen
 
 ### Install
 
-TODO
+    ansible-galaxy collection  install juanenriqueescobar.bitbucket
 
 #### Username and Password
 

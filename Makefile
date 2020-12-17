@@ -8,10 +8,11 @@ sanity:
 	ansible-test sanity
 
 build: sanity test
-	ansible-galaxy collection build --force
+	rm *.tar.gz
+	ansible-galaxy collection build
 
 publish:
 		ansible-galaxy \
 		collection publish \
 		--token $(TOKEN)\
-		juanenriqueescobar-bitbucket-$(VERSION).tar.gz
+		*.tar.gz
