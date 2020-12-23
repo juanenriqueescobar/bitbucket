@@ -88,7 +88,7 @@
   juanenriqueescobar.bitbucket.deployment:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "xxxxx/yyyyyy"      
+    repository: "xxxxx/yyyyyy"
     state:      "present"
     deployment: "Staging-1"
     type:       "Staging"

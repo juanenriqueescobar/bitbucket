@@ -181,7 +181,33 @@ class BitbucketClient():
             raise BitbucketClientException(
                 r.status_code, r.json(), 'removeDeploymentVar')
 
-# repository
+# pipeline enabled
+
+    def getPipelineEnabled(self, repository):
+        url = '{0}/2.0/repositories/{1}/pipelines_config'.format(
+            self.url, repository)
+        r = self.client.get(url)
+        if r.status_code == 200:
+            return r.json()['enabled']
+        raise BitbucketClientException(
+            r.status_code, r.json(), 'getPipelineEnabled')
+
+    def updatePipelineEnabled(self, repository, enabled):
+        url = '{0}/2.0/repositories/{1}/pipelines_config'.format(
+            self.url, repository)
+
+        data = {
+            "enabled": enabled
+        }
+
+        r = self.client.put(url, json=data)
+
+        if r.status_code == 200:
+            return r.json()
+        raise BitbucketClientException(
+            r.status_code, r.json(), 'updatePipelineEnabled')
+
+# repository vars
 
     def getRepositoryVars(self, repository):
         url = '{0}/2.0/repositories/{1}/pipelines_config/variables/'.format(

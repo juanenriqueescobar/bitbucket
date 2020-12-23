@@ -32,6 +32,16 @@ Example:
 
 > Every module has his own documentation with more details.
 
+#### Pipelines enabled
+
+Enable or disable pipelines in the repo
+
+    - juanenriqueescobar.bitbucket.pipelines_enabled:
+        username:    String
+        password:    String
+        repository:  String      
+        state:       present|absent
+
 #### Repository Var
 
 Modify repository's vars
@@ -84,6 +94,13 @@ Modify deployment's vars
         var_secured: Bool
 
 #### Examples
+
+    - name: enable pipelines in repository
+      juanenriqueescobar.bitbucket.pipelines_enabled:
+        username:    myuser
+        password:    password-generated-by-bitbucket
+        repository:  myworkspace/myrepo
+        state:       present
 
     - name: create secured variable at repository level  
       juanenriqueescobar.bitbucket.repository_var:
@@ -145,3 +162,12 @@ TODO
 ### Coverage
 
 TODO
+
+### TODO
+
+* more doc
+* how test roles?
+* modules:
+    * create repo
+    * repo permisions
+    * workspace vars

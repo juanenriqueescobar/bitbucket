@@ -1,0 +1,112 @@
+- name: "step 0: reset config"
+  juanenriqueescobar.bitbucket.pipelines_enabled:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"      
+    state:      "present"
+
+- name: "step 1: disabled pipelines"
+  juanenriqueescobar.bitbucket.pipelines_enabled:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"      
+    state:      "absent"
+  register: step_1
+
+- debug:
+    var: step_1
+
+- assert:
+    that:
+      - step_1.changed == true
+      - step_1.failed == false
+      - step_1.meta.repository == "merqueo/juan-enrique-test-repo"
+      - step_1.meta.result.state == "disabled"
+      - step_1.meta.result.body.enabled == false
+
+- name: "step 2: disabled pipelines again"
+  juanenriqueescobar.bitbucket.pipelines_enabled:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"      
+    state:      "absent"
+  register: step_2
+
+- debug:
+    var: step_2
+
+- assert:
+    that:
+      - step_2.changed == false
+      - step_2.failed == false
+      - step_2.meta.repository == "merqueo/juan-enrique-test-repo"
+      - step_2.meta.result.state == "not changed"
+
+- name: "step 3: enabled pipelines"
+  juanenriqueescobar.bitbucket.pipelines_enabled:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"      
+    state:      "present"
+  register: step_3
+
+- debug:
+    var: step_3
+
+- assert:
+    that:
+      - step_3.changed == true
+      - step_3.failed == false
+      - step_3.meta.repository == "merqueo/juan-enrique-test-repo"
+      - step_3.meta.result.state == "enabled"
+      - step_3.meta.result.body.enabled == true
+
+- name: "step 4: enabled pipelines again"
+  juanenriqueescobar.bitbucket.pipelines_enabled:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "{{BITBUCKET_REPOSITORY}}"      
+    state:      "present"
+  register: step_4
+
+- debug:
+    var: step_4
+
+- assert:
+    that:
+      - step_4.changed == false
+      - step_4.failed == false
+      - step_4.meta.repository == "merqueo/juan-enrique-test-repo"
+      - step_4.meta.result.state == "not changed"
+
+- name: "step 5: disable pipelines in repo that not exists"
+  juanenriqueescobar.bitbucket.pipelines_enabled:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "xxxxx/yyyyyy"
+    state:      "absent"
+  register: step_5
+  failed_when: false
+
+- debug:
+    var: step_5
+
+- assert:
+    that:
+      - step_5.meta.err_code == 404
+
+- name: "step 6: enable pipelines in repo that not exists"
+  juanenriqueescobar.bitbucket.pipelines_enabled:
+    username:   "{{BITBUCKET_USERNAME}}"
+    password:   "{{BITBUCKET_PASSWORD}}"
+    repository: "xxxxx/yyyyyy"
+    state:      "present"
+  register: step_6
+  failed_when: false
+
+- debug:
+    var: step_6
+
+- assert:
+    that:
+      - step_6.meta.err_code == 404
