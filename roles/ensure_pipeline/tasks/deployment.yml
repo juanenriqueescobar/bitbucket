@@ -4,6 +4,7 @@
     password:   "{{BITBUCKET_PASSWORD}}"
     repository: "{{BITBUCKET_REPOSITORY}}"      
     deployment: "{{__loop_var_1.DEPLOYMENT_NAME}}"
+    type:       "{{__loop_var_1.DEPLOYMENT_TYPE}}"
     state:      "present"
 
 - name: "create deployment pattern for: {{BITBUCKET_REPOSITORY}}/{{__loop_var_1.DEPLOYMENT_NAME}}"
