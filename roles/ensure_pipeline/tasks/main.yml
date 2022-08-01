@@ -16,7 +16,7 @@
     var_secured: "{{__loop_var.secured}}"
   loop:          "{{REPOSITORY_VARS}}" 
   loop_control:
-    label:    "{{__loop_var.name}}"
+    label:    "{{__loop_var.name}} -> {{__loop_var.state}}"
     loop_var: "__loop_var"
       
 - include_tasks: deployment.yml
