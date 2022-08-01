@@ -2,15 +2,15 @@
   juanenriqueescobar.bitbucket.pipelines_enabled:
     username:   "{{BITBUCKET_USERNAME}}"
     password:   "{{BITBUCKET_PASSWORD}}"
-    repository: "{{BITBUCKET_REPOSITORY}}"      
+    repository: "{{BITBUCKET_REPOSITORY}}"
     state:      "present"
 
 - name: "create repository vars for: {{BITBUCKET_REPOSITORY}}"
   juanenriqueescobar.bitbucket.repository_var:
     username:    "{{BITBUCKET_USERNAME}}"
     password:    "{{BITBUCKET_PASSWORD}}"
-    repository:  "{{BITBUCKET_REPOSITORY}}"      
-    state:       "present"
+    repository:  "{{BITBUCKET_REPOSITORY}}"
+    state:       "{{__loop_var.state | default(present) }}"
     var_name:    "{{__loop_var.name}}"
     var_value:   "{{__loop_var.value}}"
     var_secured: "{{__loop_var.secured}}"
